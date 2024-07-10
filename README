@@ -1,0 +1,8 @@
+# A simple simd strstr impl
+
+Current benchmark
+-----------------
+SIMD strstr average time: 139 microseconds
+libc strstr average time: 637 microseconds
+SIMD strstr memory bandwidth: 7.19431e+09 bytes/second
+libc strstr memory bandwidth: 1.56987e+09 bytes/second
