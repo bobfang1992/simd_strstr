@@ -93,8 +93,7 @@ void benchmark(const std::string& str, const std::string& substr, int iterations
     double simd_avg_time = static_cast<double>(simd_total_time) / iterations;
     double libc_avg_time = static_cast<double>(libc_total_time) / iterations;
 
-    std::cout << "| Test | SIMD strstr Average Time (microseconds) | libc strstr Average Time (microseconds) | SIMD strstr Memory Bandwidth (bytes/second) | libc strstr Memory Bandwidth (bytes/second) |\n";
-    std::cout << "|------|-----------------------------------------|-----------------------------------------|---------------------------------------------|---------------------------------------------|\n";
+
     std::cout << "| 1    | " << simd_avg_time << "                               | " << libc_avg_time << "                              | " << simd_bandwidth << "                                  | " << libc_bandwidth << "                                  |\n";
 }
 
@@ -106,6 +105,8 @@ void run_benchmark(std::string str, std::string substr) {
 }
 
 int main() {
+    std::cout << "| Test | SIMD strstr Average Time (microseconds) | libc strstr Average Time (microseconds) | SIMD strstr Memory Bandwidth (bytes/second) | libc strstr Memory Bandwidth (bytes/second) |\n";
+    std::cout << "|------|-----------------------------------------|-----------------------------------------|---------------------------------------------|---------------------------------------------|\n";
 
     // Create some benchmark cases
     std::string str = "This is a test string for benchmarking the SIMD strstr implementation";

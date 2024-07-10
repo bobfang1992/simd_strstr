@@ -4,13 +4,7 @@
 
 | Test | SIMD strstr Average Time (microseconds) | libc strstr Average Time (microseconds) | SIMD strstr Memory Bandwidth (bytes/second) | libc strstr Memory Bandwidth (bytes/second) |
 |------|-----------------------------------------|-----------------------------------------|---------------------------------------------|---------------------------------------------|
-| 1    | 7.72e-05                               | 5.96e-05                              | 8.93782e+11                                  | 1.15772e+12                                  |
-| Test | SIMD strstr Average Time (microseconds) | libc strstr Average Time (microseconds) | SIMD strstr Memory Bandwidth (bytes/second) | libc strstr Memory Bandwidth (bytes/second) |
-|------|-----------------------------------------|-----------------------------------------|---------------------------------------------|---------------------------------------------|
-| 1    | 8.24e-05                               | 8.25e-05                              | 8.37379e+11                                  | 8.36364e+11                                  |
-| Test | SIMD strstr Average Time (microseconds) | libc strstr Average Time (microseconds) | SIMD strstr Memory Bandwidth (bytes/second) | libc strstr Memory Bandwidth (bytes/second) |
-|------|-----------------------------------------|-----------------------------------------|---------------------------------------------|---------------------------------------------|
-| 1    | 0.0004762                               | 0.0003139                              | 1.44897e+11                                  | 2.19815e+11                                  |
-| Test | SIMD strstr Average Time (microseconds) | libc strstr Average Time (microseconds) | SIMD strstr Memory Bandwidth (bytes/second) | libc strstr Memory Bandwidth (bytes/second) |
-|------|-----------------------------------------|-----------------------------------------|---------------------------------------------|---------------------------------------------|
-| 1    | 0.0006978                               | 0.0003434                              | 9.88822e+10                                  | 2.00932e+11                                  |
+| 1    | 0.0001724                               | 9.63e-05                              | 4.00232e+11                                  | 7.16511e+11                                  |
+| 1    | 0.0003191                               | 0.000207                              | 2.16233e+11                                  | 3.33333e+11                                  |
+| 1    | 0.0001315                               | 8.96e-05                              | 5.24715e+11                                  | 7.70089e+11                                  |
+| 1    | 0.0002456                               | 0.0001243                              | 2.80945e+11                                  | 5.55109e+11                                  |
