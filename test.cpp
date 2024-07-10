@@ -48,7 +48,7 @@ int simd_strstr(std::string_view str, std::string_view substr) {
         if (match && std::memcmp(str_ptr + i, substr_ptr, substr_len) == 0) {
             return i;
         }
-        __builtin_prefetch(str_ptr + i + 16, 0, 1);
+
     }
 
     return -1;
