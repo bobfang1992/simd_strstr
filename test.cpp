@@ -54,8 +54,7 @@ int simd_strstr(std::string_view str, std::string_view substr) {
     return -1;
 }
 
-// Function to benchmark both functions and calculate average time and bandwidth
-void benchmark(const std::string& str, const std::string& substr, int iterations) {
+void benchmark(const std::string& str, const std::string& substr, int iterations, int test_id) {
     using namespace std::chrono;
 
     std::vector<long long> simd_times;
@@ -77,10 +76,10 @@ void benchmark(const std::string& str, const std::string& substr, int iterations
         auto duration_libc = duration_cast<microseconds>(end_libc - start_libc);
         libc_times.push_back(duration_libc.count());
 
-        int lib_c_result = libc_result - str.c_str();
-        if(simd_result > 0 && lib_c_result > 0 && simd_result != lib_c_result) {
+        int lib_c_result = libc_result ? libc_result - str.c_str() : -1;
+        if (simd_result >= 0 && lib_c_result >= 0 && simd_result != lib_c_result) {
             std::cerr << "!Mismatch in results params = (" << str << "," << substr << ")" << std::endl;
-            std::cerr << "SIMD result: " << simd_result << ", libc result: " << libc_result - str.c_str() << std::endl;
+            std::cerr << "SIMD result: " << simd_result << ", libc result: " << lib_c_result << std::endl;
             assert(false);
         }
     }
@@ -88,18 +87,22 @@ void benchmark(const std::string& str, const std::string& substr, int iterations
     long long simd_total_time = std::accumulate(simd_times.begin(), simd_times.end(), 0LL);
     long long libc_total_time = std::accumulate(libc_times.begin(), libc_times.end(), 0LL);
 
-    double simd_bandwidth = (static_cast<double>(str_len) / simd_total_time) * 1e6; // bytes per second
-    double libc_bandwidth = (static_cast<double>(str_len) / libc_total_time) * 1e6; // bytes per second
+    double simd_bandwidth = (static_cast<double>(str_len * iterations) / simd_total_time) * 1e6; // bytes per second
+    double libc_bandwidth = (static_cast<double>(str_len * iterations) / libc_total_time) * 1e6; // bytes per second
 
-    std::cout << "SIMD strstr average time: " << simd_total_time << " microseconds" << std::endl;
-    std::cout << "libc strstr average time: " << libc_total_time << " microseconds" << std::endl;
-    std::cout << "SIMD strstr memory bandwidth: " << simd_bandwidth << " bytes/second" << std::endl;
-    std::cout << "libc strstr memory bandwidth: " << libc_bandwidth << " bytes/second" << std::endl;
+    double simd_avg_time = static_cast<double>(simd_total_time) / iterations;
+    double libc_avg_time = static_cast<double>(libc_total_time) / iterations;
+
+    std::cout << "| Test | SIMD strstr Average Time (microseconds) | libc strstr Average Time (microseconds) | SIMD strstr Memory Bandwidth (bytes/second) | libc strstr Memory Bandwidth (bytes/second) |\n";
+    std::cout << "|------|-----------------------------------------|-----------------------------------------|---------------------------------------------|---------------------------------------------|\n";
+    std::cout << "| " << test_id << "    | " << simd_avg_time << "                               | " << libc_avg_time << "                              | " << simd_bandwidth << "                                  | " << libc_bandwidth << "                                  |\n";
 }
 
 void run_benchmark(std::string str, std::string substr) {
+    static int test = 0;
     int iterations = 9999999; // Number of iterations for averaging
-    benchmark(str, substr, iterations);
+    benchmark(str, substr, iterations, test);
+    test++;
 }
 
 int main() {
