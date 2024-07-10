@@ -95,7 +95,7 @@ void benchmark(const std::string& str, const std::string& substr, int iterations
 
     std::cout << "| Test | SIMD strstr Average Time (microseconds) | libc strstr Average Time (microseconds) | SIMD strstr Memory Bandwidth (bytes/second) | libc strstr Memory Bandwidth (bytes/second) |\n";
     std::cout << "|------|-----------------------------------------|-----------------------------------------|---------------------------------------------|---------------------------------------------|\n";
-    std::cout << "| " << test_id << "    | " << simd_avg_time << "                               | " << libc_avg_time << "                              | " << simd_bandwidth << "                                  | " << libc_bandwidth << "                                  |\n";
+    std::cout << "| 1    | " << simd_avg_time << "                               | " << libc_avg_time << "                              | " << simd_bandwidth << "                                  | " << libc_bandwidth << "                                  |\n";
 }
 
 void run_benchmark(std::string str, std::string substr) {
