@@ -143,7 +143,61 @@ int naive_strstr(std::string_view str, std::string_view substr) {
   return -1;
 }
 
-int benchmark(const std::string &str, const std::string &substr,
+size_t neon_strstr_anysize(const char *s, size_t n,
+                                        const char *needle, size_t k) {
+
+  assert(k > 0);
+  assert(n > 0);
+
+  const uint8x16_t first = vdupq_n_u8(needle[0]);
+  const uint8x16_t last = vdupq_n_u8(needle[k - 1]);
+  const uint8x8_t half = vdup_n_u8(0x0f);
+
+  const uint8_t *ptr = reinterpret_cast<const uint8_t *>(s);
+
+  union {
+    uint8_t tmp[8];
+    uint32_t word[2];
+  };
+
+  for (size_t i = 0; i < n; i += 16) {
+
+    const uint8x16_t block_first = vld1q_u8(ptr + i);
+    const uint8x16_t block_last = vld1q_u8(ptr + i + k - 1);
+
+    const uint8x16_t eq_first = vceqq_u8(first, block_first);
+    const uint8x16_t eq_last = vceqq_u8(last, block_last);
+    const uint8x16_t pred_16 = vandq_u8(eq_first, eq_last);
+    const uint8x8_t pred_8 =
+        vbsl_u8(half, vget_low_u8(pred_16), vget_high_u8(pred_16));
+
+    vst1_u8(tmp, pred_8);
+
+    if ((word[0] | word[1]) == 0) {
+      continue;
+    }
+
+    for (int j = 0; j < 8; j++) {
+      if (tmp[j] & 0x0f) {
+        if (memcmp(s + i + j + 1, needle + 1, k - 2) == 0) {
+          return i + j;
+        }
+      }
+    }
+
+    for (int j = 0; j < 8; j++) {
+      if (tmp[j] & 0xf0) {
+        if (memcmp(s + i + j + 1 + 8, needle + 1, k - 2) == 0) {
+          return i + j + 8;
+        }
+      }
+    }
+  }
+
+  return std::string::npos;
+}
+
+int benchmark(const std::string& name, const std::string &str, const std::string &substr,
               size_t seconds_to_run,
               std::function<int(std::string_view, std::string_view)> func) {
   auto start = std::chrono::high_resolution_clock::now();
@@ -159,22 +213,24 @@ int benchmark(const std::string &str, const std::string &substr,
   auto duration = std::chrono::high_resolution_clock::now() - start;
   auto duration_ns =
       std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+  std::cout << name << ": \n----------------\n";
   std::cout << "Average time: " << duration_ns / count << " ns, ";
   std::cout << "Count: " << count << std::endl;
+  std::cout << "----------------\n";
   return result;
 }
 
 int benchmark_simd_vs_std(const std::string &str, const std::string &substr,
                           size_t seconds_to_run) {
   auto result_simd =
-      benchmark(str, substr, seconds_to_run,
+      benchmark("std_strstr", str, substr, seconds_to_run,
                 [](std::string_view str, std::string_view substr) {
-                  return simd_strstr(str, substr);
+                  return str.find(substr);
                 });
   auto result_std =
-      benchmark(str, substr, seconds_to_run,
+      benchmark("simd_strstr", str, substr, seconds_to_run,
                 [](std::string_view str, std::string_view substr) {
-                  return naive_strstr(str, substr);
+                  return neon_strstr_anysize(str.data(), str.size(), substr.data(), substr.size());
                 });
   if (result_simd != result_std) {
     std::cout << "Mismatch: " << result_simd << " vs " << result_std
@@ -189,7 +245,8 @@ int main() {
 
   benchmark_simd_vs_std(str, substr, 1);
 
-  str = "hello this is a new and interesting world, where we celebrate the harmony enjoyed by all human being";
+  str = "hello this is a new and interesting world, where we celebrate the "
+        "harmony enjoyed by all human being";
   substr = "world";
   benchmark_simd_vs_std(str, substr, 1);
   return 0;
