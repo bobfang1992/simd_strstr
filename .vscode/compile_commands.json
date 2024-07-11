@@ -1,0 +1,6 @@
+[
+{
+  "directory": "/Users/bobfang/code/neon",
+  "arguments": ["/Library/Developer/CommandLineTools/usr/bin/clang", "-c", "-Qunused-arguments", "-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk", "-std=c++20", "-o", "build/.objs/test/macosx/arm64/release/test.cpp.o", "test.cpp"],
+  "file": "test.cpp"
+}]
