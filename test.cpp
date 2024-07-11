@@ -323,11 +323,11 @@ int main() {
   std::string str = long_text;
   std::string substr = "sqlite3_initialize";
 
-  benchmark_simd_vs_std(str, substr, 1);
+  benchmark_simd_vs_std(str, substr, 3);
 
   str = "hello this is a new and interesting world, where we celebrate the "
         "harmony enjoyed by all human being";
   substr = "world";
-  benchmark_simd_vs_std(str, substr, 1);
+  benchmark_simd_vs_std(str, substr, 3);
   return 0;
 }
