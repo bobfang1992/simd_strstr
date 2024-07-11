@@ -1,5 +1,5 @@
 set_languages("c++20")
-
+add_requires("benchmark")
 
 
 target("test")
@@ -13,3 +13,14 @@ target("test")
         set_optimize("fastest")
     end
 
+target("run_benchmark")
+    set_kind("binary")
+    add_files("benchmark.cpp")
+    add_cxflags("-Wall", "-Wextra", "-Werror", "-fno-slp-vectorize")
+    add_packages("benchmark")
+    -- Set optimization level based on the build mode
+    if is_mode("debug") then
+        set_optimize("none")
+    elseif is_mode("release") then
+        set_optimize("fastest")
+    end
