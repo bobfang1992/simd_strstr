@@ -1,6 +1,6 @@
 [
 {
   "directory": "/Users/bobfang/code/neon",
-  "arguments": ["/Library/Developer/CommandLineTools/usr/bin/clang", "-c", "-Qunused-arguments", "-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk", "-O0", "-std=c++20", "-Wall", "-Wextra", "-Werror", "-fno-slp-vectorize", "-o", "build/.objs/test/macosx/arm64/debug/test.cpp.o", "test.cpp"],
+  "arguments": ["/Library/Developer/CommandLineTools/usr/bin/clang", "-c", "-Qunused-arguments", "-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk", "-I", "/Users/bobfang/.xmake/packages/b/benchmark/1.8.3/6e25a6199e6648668c43cb61883ec330/include", "-o", "build/.objs/test/macosx/arm64/release/test.cpp.o", "test.cpp"],
   "file": "test.cpp"
 }]

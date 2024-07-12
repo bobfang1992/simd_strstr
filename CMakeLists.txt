@@ -5,38 +5,109 @@
 # project
 cmake_minimum_required(VERSION 3.15.0)
 cmake_policy(SET CMP0091 NEW)
-project(test LANGUAGES CXX C)
+project(memory-bandwidth LANGUAGES CXX)
+
+# target
+add_executable(memory-bandwidth "")
+set_target_properties(memory-bandwidth PROPERTIES OUTPUT_NAME "memory-bandwidth")
+set_target_properties(memory-bandwidth PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/linux/arm64-v8a/debug")
+target_include_directories(memory-bandwidth SYSTEM PRIVATE
+    /home/bobfang/.xmake/packages/f/fmt/10.2.1/505ef80b74ab4417864cda7867f207e9/include
+)
+target_compile_options(memory-bandwidth PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-Wall>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wall>
+    $<$<COMPILE_LANGUAGE:C>:-Wextra>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+    $<$<COMPILE_LANGUAGE:C>:-Werror>
+    $<$<COMPILE_LANGUAGE:CXX>:-Werror>
+)
+set_target_properties(memory-bandwidth PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(memory-bandwidth PRIVATE cxx_std_20)
+if(MSVC)
+    target_compile_options(memory-bandwidth PRIVATE $<$<CONFIG:Debug>:-Od>)
+else()
+    target_compile_options(memory-bandwidth PRIVATE -O0)
+endif()
+if(MSVC)
+    set_property(TARGET memory-bandwidth PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+target_link_libraries(memory-bandwidth PRIVATE
+    fmt
+)
+target_link_directories(memory-bandwidth PRIVATE
+    /home/bobfang/.xmake/packages/f/fmt/10.2.1/505ef80b74ab4417864cda7867f207e9/lib
+)
+target_sources(memory-bandwidth PRIVATE
+    memory-bandwidth.cpp
+)
+
+# target
+add_executable(run_benchmark "")
+set_target_properties(run_benchmark PROPERTIES OUTPUT_NAME "run_benchmark")
+set_target_properties(run_benchmark PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/linux/arm64-v8a/debug")
+target_include_directories(run_benchmark SYSTEM PRIVATE
+    /home/bobfang/.xmake/packages/b/benchmark/1.8.4/81d9d3ec04e549249ae578108628e49b/include
+)
+target_compile_options(run_benchmark PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-Wall>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wall>
+    $<$<COMPILE_LANGUAGE:C>:-Wextra>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+    $<$<COMPILE_LANGUAGE:C>:-Werror>
+    $<$<COMPILE_LANGUAGE:CXX>:-Werror>
+    $<$<COMPILE_LANGUAGE:C>:-fno-slp-vectorize>
+    $<$<COMPILE_LANGUAGE:CXX>:-fno-slp-vectorize>
+)
+set_target_properties(run_benchmark PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(run_benchmark PRIVATE cxx_std_20)
+if(MSVC)
+    target_compile_options(run_benchmark PRIVATE $<$<CONFIG:Debug>:-Od>)
+else()
+    target_compile_options(run_benchmark PRIVATE -O0)
+endif()
+if(MSVC)
+    set_property(TARGET run_benchmark PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+target_link_libraries(run_benchmark PRIVATE
+    benchmark_main
+    benchmark
+    pthread
+)
+target_link_directories(run_benchmark PRIVATE
+    /home/bobfang/.xmake/packages/b/benchmark/1.8.4/81d9d3ec04e549249ae578108628e49b/lib
+)
+target_sources(run_benchmark PRIVATE
+    benchmark.cpp
+)
 
 # target
 add_executable(test "")
 set_target_properties(test PROPERTIES OUTPUT_NAME "test")
-set_target_properties(test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
-target_include_directories(test SYSTEM PRIVATE
-    /Users/bobfang/.xmake/packages/b/benchmark/1.8.3/6e25a6199e6648668c43cb61883ec330/include
-)
+set_target_properties(test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/linux/arm64-v8a/debug")
 target_compile_options(test PRIVATE
-    $<$<COMPILE_LANGUAGE:C>:-isysroot>
-    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
-    $<$<COMPILE_LANGUAGE:C>:/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk>
-    $<$<COMPILE_LANGUAGE:CXX>:/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk>
+    $<$<COMPILE_LANGUAGE:C>:-Wall>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wall>
+    $<$<COMPILE_LANGUAGE:C>:-Wextra>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+    $<$<COMPILE_LANGUAGE:C>:-Werror>
+    $<$<COMPILE_LANGUAGE:CXX>:-Werror>
+    $<$<COMPILE_LANGUAGE:C>:-fno-slp-vectorize>
+    $<$<COMPILE_LANGUAGE:CXX>:-fno-slp-vectorize>
 )
+set_target_properties(test PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(test PRIVATE cxx_std_20)
+if(MSVC)
+    target_compile_options(test PRIVATE $<$<CONFIG:Debug>:-Od>)
+else()
+    target_compile_options(test PRIVATE -O0)
+endif()
 if(MSVC)
     set_property(TARGET test PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
-target_link_libraries(test PRIVATE
-    benchmark_main
-    benchmark
-)
-target_link_directories(test PRIVATE
-    /Users/bobfang/.xmake/packages/b/benchmark/1.8.3/6e25a6199e6648668c43cb61883ec330/lib
-)
-target_link_options(test PRIVATE
-    -isysroot
-    /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
-    -stdlib=libc++
-    -lz
-)
 target_sources(test PRIVATE
     test.cpp
 )

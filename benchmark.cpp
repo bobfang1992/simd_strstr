@@ -292,7 +292,7 @@ static void BM_simd_strstr(benchmark::State& state, const std::string& str, cons
 int main(int argc, char** argv) {
 
   std::string str = long_text;
-  std::string substr = "sqlite3_initialize";
+  std::string substr = "sqlite3_shutdown";
 
   benchmark::RegisterBenchmark("BM_std_strstr", BM_std_strstr, str, substr);
   benchmark::RegisterBenchmark("BM_simd_strstr", BM_simd_strstr, str, substr);
