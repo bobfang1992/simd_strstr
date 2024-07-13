@@ -5,7 +5,53 @@
 # project
 cmake_minimum_required(VERSION 3.15.0)
 cmake_policy(SET CMP0091 NEW)
-project(memory-bandwidth LANGUAGES CXX C)
+project(memcpy-test LANGUAGES CXX C)
+
+# target
+add_executable(memcpy-test "")
+set_target_properties(memcpy-test PROPERTIES OUTPUT_NAME "memcpy-test")
+set_target_properties(memcpy-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/macosx/arm64/release")
+target_include_directories(memcpy-test SYSTEM PRIVATE
+    /opt/homebrew/Cellar/fmt/10.2.1_1/include
+)
+target_compile_options(memcpy-test PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-isysroot>
+    $<$<COMPILE_LANGUAGE:CXX>:-isysroot>
+    $<$<COMPILE_LANGUAGE:C>:/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk>
+    $<$<COMPILE_LANGUAGE:CXX>:/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk>
+    $<$<COMPILE_LANGUAGE:C>:-Wall>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wall>
+    $<$<COMPILE_LANGUAGE:C>:-Wextra>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+    $<$<COMPILE_LANGUAGE:C>:-Werror>
+    $<$<COMPILE_LANGUAGE:CXX>:-Werror>
+)
+set_target_properties(memcpy-test PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(memcpy-test PRIVATE cxx_std_20)
+if(MSVC)
+    target_compile_options(memcpy-test PRIVATE $<$<CONFIG:Release>:-Ox -fp:fast>)
+else()
+    target_compile_options(memcpy-test PRIVATE -O3)
+endif()
+if(MSVC)
+    set_property(TARGET memcpy-test PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+target_link_libraries(memcpy-test PRIVATE
+    fmt
+)
+target_link_directories(memcpy-test PRIVATE
+    /opt/homebrew/Cellar/fmt/10.2.1_1/lib
+)
+target_link_options(memcpy-test PRIVATE
+    -isysroot
+    /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
+    -stdlib=libc++
+    -lz
+)
+target_sources(memcpy-test PRIVATE
+    memcpy-test.cpp
+)
 
 # target
 add_executable(memory-bandwidth "")

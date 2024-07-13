@@ -32,6 +32,9 @@ std::vector<int8_t> create_array_for_test(size_t kArraySize = 1024 * 1024 *
 std::vector<int8_t> create_array_dest(const std::vector<int8_t> &src) {
   std::vector<int8_t> dest;
   dest.resize(src.size());
+  for (size_t i = 0; i < src.size(); i++) {
+    dest[i] = 0;
+  }
   return dest;
 }
 
@@ -73,7 +76,11 @@ int run_benchmark(const std::vector<int8_t> &src, std::vector<int8_t> &dest,
   }
   std::cout << std::endl;
 
-  verify(src, dest);
+  if (!verify(src, dest)) {
+    print_with_timestamp("Verification failed");
+    std::cout << std::endl;
+    return -1;
+  }
 
   double totalExecutionTime = total.count();
 
@@ -91,6 +98,8 @@ int run_benchmark(const std::vector<int8_t> &src, std::vector<int8_t> &dest,
   double throughput = totalBytesProcessedInGB / (totalExecutionTime / 1000);
 
   print_with_timestamp(fmt::format("Throughput: {} GB/s", throughput));
+
+  std::cout << std::endl;
 
   return 0;
 }
@@ -112,7 +121,6 @@ int std_memcpy(const std::vector<int8_t> &src, std::vector<int8_t> &dest) {
   std::memcpy(dest.data(), src.data(), src.size());
   return 0;
 }
-
 
 int neon_simd_cpy(const std::vector<int8_t> &src, std::vector<int8_t> &dest) {
   if (src.size() != dest.size()) {
@@ -137,9 +145,9 @@ int parallel_cpy(const std::vector<int8_t> &src, std::vector<int8_t> &dest) {
   size_t chunk_size = src.size() / num_threads;
   std::vector<std::thread> threads;
   for (size_t i = 0; i < num_threads; i++) {
-    threads.push_back(std::thread([i, chunk_size, &src, &dest]() {
+    threads.push_back(std::thread([i, chunk_size, num_threads, &src, &dest]() {
       size_t start = i * chunk_size;
-      size_t end = start + chunk_size;
+      size_t end = (i == num_threads - 1) ? src.size() : start + chunk_size;
       for (size_t j = start; j < end; j++) {
         dest[j] = src[j];
       }
@@ -157,7 +165,7 @@ int prefetch_cpy(const std::vector<int8_t> &src, std::vector<int8_t> &dest) {
   }
   size_t i = 0;
   for (; i < src.size() - 15; i += 16) {
-    __builtin_prefetch(src.data() + i + 16);
+    __builtin_prefetch(src.data() + i + 16, 0, 0);
     int8x16_t v = vld1q_s8(src.data() + i);
     vst1q_s8(dest.data() + i, v);
   }
@@ -179,7 +187,6 @@ int main() {
   print_with_timestamp("Running std::memcpy");
   run_benchmark(arr, dest, iterations, std_memcpy);
 
-
   dest = create_array_dest(arr);
   print_with_timestamp("Running neon_simd_cpy");
   run_benchmark(arr, dest, iterations, neon_simd_cpy);
@@ -191,7 +198,6 @@ int main() {
   dest = create_array_dest(arr);
   print_with_timestamp("Running prefetch_cpy");
   run_benchmark(arr, dest, iterations, prefetch_cpy);
-
 
   return 0;
 }
