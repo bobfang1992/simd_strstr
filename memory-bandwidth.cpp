@@ -9,6 +9,7 @@
 #include <fmt/core.h>
 #include <thread>
 #include <arm_neon.h>
+#include <memory> 
 
 
 constexpr int64_t kArraySize = 1024 * 1024 * 32;
@@ -109,6 +110,58 @@ int parallel_sum(const std::vector<int8_t>& arr) {
     return std::accumulate(results.begin(), results.end(), 0);
 }
 
+int parallel_neon_sum(const std::vector<int8_t>& arr) {
+    if (arr.empty()) return 0;
+
+    auto worker_func = [](const std::vector<int8_t>& arr, size_t start, size_t end) {
+        int32x4_t v_sum = vdupq_n_s32(0);
+        size_t i = start;
+
+        for (; i + 15 < end; i += 16) {
+            int8x16_t v_data = vld1q_s8(&arr[i]);
+
+            int16x8_t v_data_low = vmovl_s8(vget_low_s8(v_data));
+            int16x8_t v_data_high = vmovl_s8(vget_high_s8(v_data));
+
+            v_sum = vaddq_s32(v_sum, vpaddlq_s16(v_data_low));
+            v_sum = vaddq_s32(v_sum, vpaddlq_s16(v_data_high));
+        }
+
+        int32_t sum_array[4];
+        vst1q_s32(sum_array, v_sum);
+
+        int sum = sum_array[0] + sum_array[1] + sum_array[2] + sum_array[3];
+
+        for (; i < end; ++i) {
+            sum += arr[i];
+        }
+
+        return sum;
+    };
+
+    int num_threads = std::thread::hardware_concurrency();
+    int64_t kArraySize = arr.size();
+    int64_t chunk_size = kArraySize / num_threads;
+    std::vector<std::thread> threads;
+    std::vector<int> results(num_threads, 0);
+
+    for (int i = 0; i < num_threads; i++) {
+        size_t start = i * chunk_size;
+        size_t end = (i == num_threads - 1) ? kArraySize : (i + 1) * chunk_size;
+        threads.emplace_back([start, end, &arr, &results, i, worker_func]() {
+            results[i] = worker_func(arr, start, end);
+        });
+    }
+
+    for (auto& thread : threads) {
+        if (thread.joinable()) {
+            thread.join();
+        }
+    }
+
+    return std::accumulate(results.begin(), results.end(), 0);
+}
+
 void print_with_timestamp(const std::string& message) {
     auto now = std::chrono::system_clock::now();
     std::time_t time = std::chrono::system_clock::to_time_t(now);
@@ -173,4 +226,7 @@ int main() {
 
     print_with_timestamp("-------- running parallel sum --------");
     run_benchmark(arr, 100, parallel_sum);
+
+    print_with_timestamp("-------- running parallel NEON sum --------");
+    run_benchmark(arr, 100, parallel_neon_sum);
 }
