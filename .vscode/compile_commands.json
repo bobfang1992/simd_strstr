@@ -1,6 +1,16 @@
 [
 {
   "directory": "/Users/bobfang/code/neon",
-  "arguments": ["/Library/Developer/CommandLineTools/usr/bin/clang", "-c", "-Qunused-arguments", "-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk", "-I", "/Users/bobfang/.xmake/packages/b/benchmark/1.8.3/6e25a6199e6648668c43cb61883ec330/include", "-o", "build/.objs/test/macosx/arm64/release/test.cpp.o", "test.cpp"],
+  "arguments": ["/Library/Developer/CommandLineTools/usr/bin/clang", "-c", "-Qunused-arguments", "-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk", "-O3", "-std=c++20", "-isystem", "/opt/homebrew/Cellar/fmt/10.2.1_1/include", "-Wall", "-Wextra", "-Werror", "-o", "build/.objs/memory-bandwidth/macosx/arm64/release/memory-bandwidth.cpp.o", "memory-bandwidth.cpp"],
+  "file": "memory-bandwidth.cpp"
+},
+{
+  "directory": "/Users/bobfang/code/neon",
+  "arguments": ["/Library/Developer/CommandLineTools/usr/bin/clang", "-c", "-Qunused-arguments", "-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk", "-O3", "-std=c++20", "-isystem", "/Users/bobfang/.xmake/packages/b/benchmark/1.8.3/6e25a6199e6648668c43cb61883ec330/include", "-Wall", "-Wextra", "-Werror", "-fno-slp-vectorize", "-o", "build/.objs/run_benchmark/macosx/arm64/release/benchmark.cpp.o", "benchmark.cpp"],
+  "file": "benchmark.cpp"
+},
+{
+  "directory": "/Users/bobfang/code/neon",
+  "arguments": ["/Library/Developer/CommandLineTools/usr/bin/clang", "-c", "-Qunused-arguments", "-isysroot", "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk", "-O3", "-std=c++20", "-Wall", "-Wextra", "-Werror", "-fno-slp-vectorize", "-o", "build/.objs/test/macosx/arm64/release/test.cpp.o", "test.cpp"],
   "file": "test.cpp"
 }]
