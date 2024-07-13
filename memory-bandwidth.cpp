@@ -11,7 +11,7 @@
 #include <random> // Include the random header
 #include <thread>
 
-constexpr int64_t kArraySize = 1024 * 1024 * 1;
+constexpr int64_t kArraySize = 1024 * 1024 * 1024;
 
 int8_t rand_int() {
   static int i = 0;
