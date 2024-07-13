@@ -37,3 +37,15 @@ target("memory-bandwidth")
     elseif is_mode("release") then
         set_optimize("fastest")
     end
+
+target("memcpy-test")
+    set_kind("binary")
+    add_files("memcpy-test.cpp")
+    add_cxflags("-Wall", "-Wextra", "-Werror")
+    add_packages("fmt")
+    -- Set optimization level based on the build mode
+    if is_mode("debug") then
+        set_optimize("none")
+    elseif is_mode("release") then
+        set_optimize("fastest")
+    end
