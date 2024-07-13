@@ -11,7 +11,7 @@
 #include <random> // Include the random header
 #include <thread>
 
-constexpr int64_t kArraySize = 1024 * 1024 * 1024;
+constexpr int64_t kArraySize = 1024 * 1024 * 1023 + 1;
 
 int8_t rand_int() {
   static int i = 0;
@@ -33,6 +33,37 @@ int sum_sequential(const std::vector<int8_t> &arr) {
     sum += arr[i];
   }
   return sum;
+}
+
+int32_t sum_sequential_decompiled(const std::vector<signed char>& vec) {
+    // Initialize NEON vector for accumulation
+    int32x4_t sum_vec = vdupq_n_s32(0);
+
+    // Process elements in chunks of 16 bytes
+    size_t i = 0;
+    for (; i + 15 < vec.size(); i += 16) {
+        // Load 16 signed chars into a NEON register
+        int8x16_t data = vld1q_s8(&vec[i]);
+
+        // Extend 8-bit values to 16-bit values
+        int16x8_t data_low = vmovl_s8(vget_low_s8(data));
+        int16x8_t data_high = vmovl_s8(vget_high_s8(data));
+
+        // Extend 16-bit values to 32-bit values and accumulate
+        sum_vec = vpadalq_s16(sum_vec, data_low);
+        sum_vec = vpadalq_s16(sum_vec, data_high);
+    }
+
+    // Horizontal add within the NEON register
+    int32x2_t sum_pair = vadd_s32(vget_low_s32(sum_vec), vget_high_s32(sum_vec));
+    int32_t sum = vget_lane_s32(vpadd_s32(sum_pair, sum_pair), 0);
+
+    // Handle any remaining elements
+    for (; i < vec.size(); ++i) {
+        sum += static_cast<int32_t>(vec[i]);
+    }
+
+    return sum;
 }
 
 int random_access_sum(const std::vector<int8_t> &arr) {
@@ -273,6 +304,13 @@ int main(int argc, char *argv[]) {
                 "sequential") != benchmarks_to_run.end()) {
     print_with_timestamp("-------- running sequential sum --------");
     run_benchmark(arr, 100, sum_sequential);
+  }
+
+  if (benchmarks_to_run.empty() ||
+      std::find(benchmarks_to_run.begin(), benchmarks_to_run.end(),
+                "sequential_decompiled") != benchmarks_to_run.end()) {
+    print_with_timestamp("-------- running sequential decompiled sum --------");
+    run_benchmark(arr, 100, sum_sequential_decompiled);
   }
 
   if (benchmarks_to_run.empty() ||

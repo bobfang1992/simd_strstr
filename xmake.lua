@@ -6,7 +6,7 @@ add_requires("fmt")
 target("test")
     set_kind("binary")
     add_files("test.cpp")
-    add_cxflags("-Wall", "-Wextra", "-Werror", "-fno-slp-vectorize")
+    add_cxflags("-Wall", "-Wextra", "-Werror")
     -- Set optimization level based on the build mode
     if is_mode("debug") then
         set_optimize("none")
@@ -17,7 +17,7 @@ target("test")
 target("run_benchmark")
     set_kind("binary")
     add_files("benchmark.cpp")
-    add_cxflags("-Wall", "-Wextra", "-Werror", "-fno-slp-vectorize")
+    add_cxflags("-Wall", "-Wextra", "-Werror")
     add_packages("benchmark")
     -- Set optimization level based on the build mode
     if is_mode("debug") then
